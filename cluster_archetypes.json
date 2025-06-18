@@ -1,0 +1,107 @@
+{
+  "0": {
+    "keywords": [
+      "known",
+      "member",
+      "manga",
+      "character",
+      "series",
+      "skills",
+      "demeanor",
+      "skilled",
+      "combat",
+      "despite"
+    ],
+    "sample_characters": [
+      "Natsu Dragneel",
+      "Dr. Shizuka Hattori",
+      "Koumei Shokatsuryou"
+    ],
+    "archetype_name": "Fiery Strategist",
+    "description": "A skilled combatant with a fiery demeanor, blending raw power with tactical brilliance."
+  },
+  "1": {
+    "keywords": [
+      "school",
+      "high",
+      "student",
+      "manga",
+      "protagonist",
+      "main",
+      "life",
+      "girl",
+      "despite",
+      "series"
+    ],
+    "sample_characters": [
+      "Patrick Verona",
+      "Issei Hyoudou",
+      "Natsuru Senou"
+    ],
+    "archetype_name": "Rebel Scholar",
+    "description": "A high school protagonist who defies expectations while navigating academic life."
+  },
+  "2": {
+    "keywords": [
+      "portrayed",
+      "film",
+      "known",
+      "war",
+      "team",
+      "character",
+      "young",
+      "new",
+      "world",
+      "series"
+    ],
+    "sample_characters": [
+      "Emily Jenkins",
+      "William Wallace",
+      "Marlena Dietrich"
+    ],
+    "archetype_name": "Resilient Mavericks",
+    "description": "A team of daring individuals who defy expectations and change the world through their unyielding spirit and unity."
+  },
+  "3": {
+    "keywords": [
+      "film",
+      "played",
+      "character",
+      "protagonist",
+      "known",
+      "life",
+      "love",
+      "young",
+      "plays",
+      "characters"
+    ],
+    "sample_characters": [
+      "Jigsaw (John Kramer)",
+      "Lady Bird McPherson",
+      "Henry Hill"
+    ],
+    "archetype_name": "Fate's Player",
+    "description": "A character who manipulates destiny, playing pivotal roles in the lives of others."
+  },
+  "4": {
+    "keywords": [
+      "world",
+      "protagonist",
+      "manga",
+      "series",
+      "life",
+      "young",
+      "character",
+      "main",
+      "love",
+      "girl"
+    ],
+    "sample_characters": [
+      "Kazuya Saotome",
+      "Tomoya Okazaki",
+      "Akira Fudo (Devilman)"
+    ],
+    "archetype_name": "Youthful Seeker",
+    "description": "A young protagonist navigating love, life, and the complexities of the world."
+  }
+}

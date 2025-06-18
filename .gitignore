@@ -1,0 +1,11 @@
+dataset/
+venv/
+
+# Ignore Python cache files
+
+__pycache__/
+
+.env
+
+*.zip
+*.ipynb 
