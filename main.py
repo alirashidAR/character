@@ -11,6 +11,10 @@ data = pd.read_json("clustered_characters.json")
 with open("cluster_archetypes.json") as f:
     cluster_archetypes = json.load(f)
 
+# Load full character info JSON
+full_character_info = pd.read_json("character_codex.json")  # This is your new JSON file
+
+
 # Initialize FastAPI app
 app = FastAPI(title="Character Archetype API")
 
@@ -31,6 +35,31 @@ class UserSelection(BaseModel):
 @app.get("/")
 def root():
     return {"message": "Character Archetype API running"}
+
+# POST endpoint to fetch media sources from full character info
+@app.post("/characters/full_info")
+def get_full_character_info(selection: UserSelection):
+    selection_lower = [name.lower() for name in selection.character_names]
+    temp = full_character_info.copy()
+    temp['character_name_lower'] = temp['character_name'].str.lower()
+
+    matched = temp[temp['character_name_lower'].isin(selection_lower)]
+
+    if matched.empty:
+        return {"error": "No matching characters found in full character info"}
+
+    results = matched[[
+        'character_name', 'media_source', 'media_type', 'genre', 'description'
+    ]].to_dict(orient='records')
+
+    matched_names = matched['character_name_lower'].tolist()
+    unmatched_names = list(set(selection_lower) - set(matched_names))
+
+    return {
+        "count": len(results),
+        "characters": results,
+        "unmatched_names": unmatched_names
+    }
 
 # Get full character list
 @app.get("/characters")
@@ -75,4 +104,4 @@ def get_user_archetype(selection: UserSelection):
 # Run with `python character_archetypes_api.py`
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=5000)
+    uvicorn.run("main:app", port=5000 ,reload=True)
