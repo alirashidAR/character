@@ -1,0 +1,29 @@
+name: Ping Render Service
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Run every 10 minutes
+  workflow_dispatch:        # Allow manual triggers
+  push:
+    branches: [main]        # Run on push to main to verify setup
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10 # Increase timeout to 10 minutes
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Ping Render service
+        run: node index.js
+        env:
+          RENDER_URL: ${{ secrets.RENDER_URL }}
