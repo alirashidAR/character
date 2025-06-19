@@ -104,4 +104,4 @@ def get_user_archetype(selection: UserSelection):
 # Run with `python character_archetypes_api.py`
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", port=5000 ,reload=True)
+    uvicorn.run("main:app", port=5000)
