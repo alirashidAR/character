@@ -1,42 +1,48 @@
 import json
+import os
+import random
+from collections import Counter
+from typing import List
+
 import pandas as pd
-from fastapi import FastAPI
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
-from collections import Counter
+from pymongo import MongoClient
 
-# Load clustered characters and archetypes
+# Load environment variables
+load_dotenv()
+
+# Load data
 data = pd.read_json("clustered_characters.json")
 with open("cluster_archetypes.json") as f:
     cluster_archetypes = json.load(f)
+full_character_info = pd.read_json("character_codex.json")
 
-# Load full character info JSON
-full_character_info = pd.read_json("character_codex.json")  # This is your new JSON file
+# MongoDB setup
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client["character_blend"]
+users_collection = db["users"]
 
-
-# Initialize FastAPI app
+# FastAPI setup
 app = FastAPI(title="Character Archetype API")
-
-# Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Use specific domains in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Pydantic model for user selection input
+# Pydantic model
 class UserSelection(BaseModel):
     character_names: List[str]
 
-# Root endpoint
 @app.get("/")
 def root():
     return {"message": "Character Archetype API running"}
 
-# POST endpoint to fetch media sources from full character info
 @app.post("/characters/full_info")
 def get_full_character_info(selection: UserSelection):
     selection_lower = [name.lower() for name in selection.character_names]
@@ -61,7 +67,6 @@ def get_full_character_info(selection: UserSelection):
         "unmatched_names": unmatched_names
     }
 
-# Get full character list
 @app.get("/characters")
 def get_characters():
     characters = data[['character_name', 'media_type', 'archetype_cluster']].sort_values(by="character_name")
@@ -70,24 +75,20 @@ def get_characters():
         "characters": characters.to_dict(orient='records')
     }
 
-# Get just the character names (for dropdowns or UIs)
 @app.get("/characters/names")
 def get_character_names():
     names = sorted(data['character_name'].unique().tolist())
     return {"character_names": names}
 
-# Get cluster stats (number of characters in each cluster)
 @app.get("/clusters/stats")
 def get_cluster_stats():
     counts = data['archetype_cluster'].value_counts().sort_index().to_dict()
     return {"cluster_counts": counts}
 
-# Get full archetype descriptions and sample characters
 @app.get("/clusters/archetypes")
 def get_all_archetypes():
     return cluster_archetypes
 
-# Get dominant archetype based on selected character names
 @app.post("/user/archetype")
 def get_user_archetype(selection: UserSelection):
     selected = data[data['character_name'].isin(selection.character_names)]
@@ -101,7 +102,59 @@ def get_user_archetype(selection: UserSelection):
         **cluster_archetypes.get(str(dominant), {})
     }
 
-# Run with `python character_archetypes_api.py`
+@app.get("/blend/{user_a}/{user_b}")
+def blend_users(user_a: str, user_b: str):
+    user1 = users_collection.find_one({"user_id": user_a})
+    user2 = users_collection.find_one({"user_id": user_b})
+
+    if not user1 or not user2:
+        raise HTTPException(status_code=404, detail="One or both users not found")
+
+    genres1 = set(user1.get("genres", []))
+    genres2 = set(user2.get("genres", []))
+    archetypes1 = {a["id"]: a for a in user1.get("archetypes", [])}
+    archetypes2 = {a["id"]: a for a in user2.get("archetypes", [])}
+    media1 = set(user1.get("media_sources", []))
+    media2 = set(user2.get("media_sources", []))
+
+    # Find shared elements
+    common_genres = sorted(genres1 & genres2)
+    common_media = sorted(media1 & media2)
+    common_archetypes = [
+        archetypes1[aid] for aid in archetypes1 if aid in archetypes2
+    ]
+
+    # Fallback: pick 2 random genres from the union if no common genres
+    if not common_genres:
+        all_genres = list(genres1.union(genres2))
+        random.shuffle(all_genres)
+        common_genres = all_genres[:2] if len(all_genres) >= 2 else all_genres
+
+    # Recommend movies from those genres
+    temp = full_character_info.copy()
+    temp['genre'] = temp['genre'].apply(lambda g: g if isinstance(g, list) else [g])
+    matched_movies = temp[temp['genre'].apply(lambda g_list: any(genre in g_list for genre in common_genres))]
+
+    # Fix unhashable type error
+    matched_movies['genre_str'] = matched_movies['genre'].apply(lambda x: ', '.join(x) if isinstance(x, list) else str(x))
+
+    # Filter and deduplicate
+    recommended_movies = matched_movies[['media_source', 'genre_str', 'media_type']].drop_duplicates()
+    recommended_movies = recommended_movies[recommended_movies['media_type'].str.lower() == 'movies']
+    recommended_list = recommended_movies.rename(columns={'genre_str': 'genre'}).sample(n=min(5, len(recommended_movies))).to_dict(orient='records')
+
+    blend_name = f"{user_a} × {user_b} Blend"
+
+    return {
+        "blend_name": blend_name,
+        "shared_genres": common_genres,
+        "shared_archetypes": common_archetypes,
+        "shared_media_sources": common_media,
+        "recommended_movies": recommended_list,
+        "user_a": user_a,
+        "user_b": user_b
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", port=5000)
