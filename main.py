@@ -155,6 +155,52 @@ def blend_users(user_a: str, user_b: str):
         "user_b": user_b
     }
 
+
+@app.get("/media/characters_grouped")
+def get_characters_grouped_by_media_type():
+    valid_types = {"Movies", "Television Shows", "Anime"}
+    temp = full_character_info.copy()
+    
+    # Ensure consistent casing
+    temp['media_type'] = temp['media_type'].str.title()
+
+    # Filter by allowed media types
+    filtered = temp[temp['media_type'].isin(valid_types)]
+
+    result = {}
+    for _, row in filtered.iterrows():
+        media = row['media_source']
+        character_entry = {
+            "character_name": row['character_name'],
+            "genre": row['genre'],
+            "media_type": row['media_type'],
+            "description": row['description']
+        }
+        result.setdefault(media, {"characters": []})["characters"].append(character_entry)
+
+    return result
+
+@app.get("/media/available")
+def get_available_media():
+    valid_types = {"Movies", "Television Shows", "Anime"}
+    temp = full_character_info.copy()
+
+    # Normalize media type casing
+    temp['media_type'] = temp['media_type'].str.title()
+    
+    # Filter to valid types
+    filtered = temp[temp['media_type'].isin(valid_types)]
+
+    result = {}
+    for media_type in valid_types:
+        media_list = sorted(
+            filtered[filtered['media_type'] == media_type]['media_source'].unique().tolist()
+        )
+        result[media_type] = media_list
+
+    return result
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", port=5000)
