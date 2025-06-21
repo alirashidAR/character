@@ -201,6 +201,26 @@ def get_available_media():
     return result
 
 
+@app.get("/user/{user_id}")
+def get_user_info(user_id: str):
+    user = users_collection.find_one({"user_id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Ensure genres and media sources are lists
+    user['genres'] = user.get('genres', [])
+    user['media_sources'] = user.get('media_sources', [])
+    
+    # Ensure archetypes is a list of dicts
+    user['archetypes'] = user.get('archetypes', [])
+
+    return {
+        "user_id": user_id,
+        "genres": user['genres'],
+        "media_sources": user['media_sources'],
+        "archetypes": user['archetypes']
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app",host="0.0.0.0", port=5000)
