@@ -1,107 +1,107 @@
 {
   "0": {
     "keywords": [
-      "known",
-      "member",
-      "manga",
-      "character",
-      "series",
-      "skills",
-      "demeanor",
-      "skilled",
-      "combat",
-      "despite"
-    ],
-    "sample_characters": [
-      "Natsu Dragneel",
-      "Dr. Shizuka Hattori",
-      "Koumei Shokatsuryou"
-    ],
-    "archetype_name": "Fiery Strategist",
-    "description": "A skilled combatant with a fiery demeanor, blending raw power with tactical brilliance."
-  },
-  "1": {
-    "keywords": [
       "school",
       "high",
       "student",
-      "manga",
       "protagonist",
-      "main",
+      "manga",
       "life",
+      "main",
       "girl",
       "despite",
-      "series"
+      "love"
     ],
     "sample_characters": [
       "Patrick Verona",
       "Issei Hyoudou",
-      "Natsuru Senou"
+      "Tomoya Aki"
     ],
-    "archetype_name": "Rebel Scholar",
-    "description": "A high school protagonist who defies expectations while navigating academic life."
+    "archetype_name": "Rebel Heartthrob",
+    "description": "A charismatic high school protagonist who defies expectations, balancing love life and personal struggles."
+  },
+  "1": {
+    "keywords": [
+      "known",
+      "family",
+      "life",
+      "despite",
+      "portrayed",
+      "world",
+      "skills",
+      "young",
+      "love",
+      "team"
+    ],
+    "sample_characters": [
+      "Dr. Shizuka Hattori",
+      "Kazuya Saotome",
+      "Sarah Silverman"
+    ],
+    "archetype_name": "The Hidden Prodigies",
+    "description": "Young individuals with extraordinary skills navigating love and life while balancing personal and team dynamics in a familiar yet complex world."
   },
   "2": {
     "keywords": [
+      "film",
       "portrayed",
-      "film",
-      "known",
-      "war",
-      "team",
-      "character",
-      "young",
-      "new",
-      "world",
-      "series"
-    ],
-    "sample_characters": [
-      "Emily Jenkins",
-      "William Wallace",
-      "Marlena Dietrich"
-    ],
-    "archetype_name": "Resilient Mavericks",
-    "description": "A team of daring individuals who defy expectations and change the world through their unyielding spirit and unity."
-  },
-  "3": {
-    "keywords": [
-      "film",
       "played",
+      "known",
       "character",
       "protagonist",
-      "known",
       "life",
-      "love",
       "young",
-      "plays",
-      "characters"
+      "story",
+      "love"
     ],
     "sample_characters": [
       "Jigsaw (John Kramer)",
-      "Lady Bird McPherson",
-      "Henry Hill"
+      "Hannibal Lecter",
+      "Lady Bird McPherson"
     ],
-    "archetype_name": "Fate's Player",
-    "description": "A character who manipulates destiny, playing pivotal roles in the lives of others."
+    "archetype_name": "Dark Mentor",
+    "description": "A complex character who guides the protagonist through twisted life lessons, often blurring the line between villain and teacher."
+  },
+  "3": {
+    "keywords": [
+      "television",
+      "host",
+      "known",
+      "personality",
+      "best",
+      "ability",
+      "provides",
+      "series",
+      "various",
+      "american"
+    ],
+    "sample_characters": [
+      "Nicole Richie",
+      "Jeff Rossen",
+      "Steve Harvey"
+    ],
+    "archetype_name": "Star Presenter",
+    "description": "A charismatic host known for their dynamic personality and ability to entertain and engage audiences across various television series."
   },
   "4": {
     "keywords": [
-      "world",
-      "protagonist",
-      "manga",
       "series",
-      "life",
-      "young",
+      "manga",
       "character",
       "main",
-      "love",
-      "girl"
+      "known",
+      "protagonist",
+      "anime",
+      "world",
+      "characters",
+      "despite"
     ],
     "sample_characters": [
-      "Kazuya Saotome",
-      "Tomoya Okazaki",
-      "Akira Fudo (Devilman)"
+      "Natsu Dragneel",
+      "Koumei Shokatsuryou",
+      "Pablo Escobar"
     ],
-    "archetype_name": "Youthful Seeker",
-    "description": "A young protagonist navigating love, life, and the complexities of the world."
+    "archetype_name": "Firebrand Strategist",
+    "description": "A daring protagonist whose fiery spirit and tactical brilliance set them apart in a world of chaos."
   }
 }

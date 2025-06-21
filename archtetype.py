@@ -12,8 +12,8 @@ import os
 load_dotenv()
 
 # Load dataset
-data = pd.read_json('dataset/characters/character_codex.json')
-media_types = {'Anime', 'Movies', 'Manga'}
+data = pd.read_json('character_codex.json')
+media_types = {'Anime', 'Movies', 'Manga','Television Shows'}
 filtered = data[data['media_type'].isin(media_types)].copy()
 
 # Clean and preprocess descriptions
