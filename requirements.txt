@@ -4,3 +4,4 @@ uvicorn
 pandas 
 scikit-learn
 dotenv
+pymongo
