@@ -364,4 +364,4 @@ def generate_daylist(user_id: str = Form(...), mood: str = Form(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", port=5000)
+    uvicorn.run("main:app", port=5000,host="0.0.0.0")
