@@ -240,4 +240,4 @@ def get_user_info(user_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", port=5000, reload=True)
+    uvicorn.run("main:app", port=5000 host="0.0.0.0")
