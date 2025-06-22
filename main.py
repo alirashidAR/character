@@ -10,6 +10,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pymongo import MongoClient
+from bson import ObjectId
 
 # Load environment variables
 load_dotenv()
@@ -21,8 +22,11 @@ with open("cluster_archetypes.json") as f:
 full_character_info = pd.read_json("character_codex.json")
 
 # MongoDB setup
-client = MongoClient(os.getenv("MONGO_URI"))
-db = client["character_blend"]
+mongo_uri = os.getenv("MONGO_URI")
+if not mongo_uri:
+    raise RuntimeError("MONGO_URI is not set in environment variables")
+client = MongoClient(mongo_uri)
+db = client["test"]
 users_collection = db["users"]
 
 # FastAPI setup
@@ -34,6 +38,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Helper function to clean MongoDB documents
+def clean_object_ids(obj):
+    if isinstance(obj, dict):
+        return {k: clean_object_ids(v) for k, v in obj.items() if k != "_id"}
+    elif isinstance(obj, list):
+        return [clean_object_ids(item) for item in obj]
+    elif isinstance(obj, ObjectId):
+        return str(obj)
+    return obj
 
 # Pydantic model
 class UserSelection(BaseModel):
@@ -110,6 +124,9 @@ def blend_users(user_a: str, user_b: str):
     if not user1 or not user2:
         raise HTTPException(status_code=404, detail="One or both users not found")
 
+    user1 = clean_object_ids(user1)
+    user2 = clean_object_ids(user2)
+
     genres1 = set(user1.get("genres", []))
     genres2 = set(user2.get("genres", []))
     archetypes1 = {a["id"]: a for a in user1.get("archetypes", [])}
@@ -155,7 +172,6 @@ def blend_users(user_a: str, user_b: str):
         "user_b": user_b
     }
 
-
 @app.get("/media/characters_grouped")
 def get_characters_grouped_by_media_type():
     valid_types = {"Movies", "Television Shows", "Anime"}
@@ -200,12 +216,13 @@ def get_available_media():
 
     return result
 
-
 @app.get("/user/{user_id}")
 def get_user_info(user_id: str):
     user = users_collection.find_one({"user_id": user_id})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    user = clean_object_ids(user)
 
     # Ensure genres and media sources are lists
     user['genres'] = user.get('genres', [])
@@ -223,4 +240,4 @@ def get_user_info(user_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app",host="0.0.0.0", port=5000)
+    uvicorn.run("main:app", port=5000, reload=True)
