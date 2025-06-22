@@ -2,6 +2,7 @@ pydantic
 fastapi
 uvicorn 
 pandas 
+python-multipart
 scikit-learn
 dotenv
 pymongo
