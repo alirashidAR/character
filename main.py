@@ -127,38 +127,52 @@ def blend_users(user_a: str, user_b: str):
     user1 = clean_object_ids(user1)
     user2 = clean_object_ids(user2)
 
-    genres1 = set(user1.get("genres", []))
-    genres2 = set(user2.get("genres", []))
+    genres1 = set([g.lower() for g in user1.get("genres", [])])
+    genres2 = set([g.lower() for g in user2.get("genres", [])])
     archetypes1 = {a["id"]: a for a in user1.get("archetypes", [])}
     archetypes2 = {a["id"]: a for a in user2.get("archetypes", [])}
     media1 = set(user1.get("media_sources", []))
     media2 = set(user2.get("media_sources", []))
 
-    # Find shared elements
+
     common_genres = sorted(genres1 & genres2)
     common_media = sorted(media1 & media2)
     common_archetypes = [
         archetypes1[aid] for aid in archetypes1 if aid in archetypes2
     ]
 
-    # Fallback: pick 2 random genres from the union if no common genres
+
     if not common_genres:
         all_genres = list(genres1.union(genres2))
         random.shuffle(all_genres)
         common_genres = all_genres[:2] if len(all_genres) >= 2 else all_genres
 
-    # Recommend movies from those genres
+
     temp = full_character_info.copy()
-    temp['genre'] = temp['genre'].apply(lambda g: g if isinstance(g, list) else [g])
+    temp['genre'] = temp['genre'].apply(lambda g: [str(genre).lower() for genre in g] if isinstance(g, list) else [str(g).lower()])
+
     matched_movies = temp[temp['genre'].apply(lambda g_list: any(genre in g_list for genre in common_genres))]
 
-    # Fix unhashable type error
+
     matched_movies['genre_str'] = matched_movies['genre'].apply(lambda x: ', '.join(x) if isinstance(x, list) else str(x))
 
-    # Filter and deduplicate
+
     recommended_movies = matched_movies[['media_source', 'genre_str', 'media_type']].drop_duplicates()
-    recommended_movies = recommended_movies[recommended_movies['media_type'].str.lower() == 'movies']
-    recommended_list = recommended_movies.rename(columns={'genre_str': 'genre'}).sample(n=min(5, len(recommended_movies))).to_dict(orient='records')
+    recommended_movies['media_type'] = recommended_movies['media_type'].str.lower()
+    movies_only = recommended_movies[recommended_movies['media_type'] == 'movies']
+
+    # Fallback: if no movies found, sample from all matched media
+    if not movies_only.empty:
+        selected = movies_only
+    elif not recommended_movies.empty:
+        selected = recommended_movies
+    else:
+        selected = pd.DataFrame()
+
+    if not selected.empty:
+        recommended_list = selected.rename(columns={'genre_str': 'genre'}).sample(n=min(5, len(selected))).to_dict(orient='records')
+    else:
+        recommended_list = []
 
     blend_name = f"{user_a} × {user_b} Blend"
 
@@ -168,9 +182,11 @@ def blend_users(user_a: str, user_b: str):
         "shared_archetypes": common_archetypes,
         "shared_media_sources": common_media,
         "recommended_movies": recommended_list,
+        "note": "No matching movies found." if not recommended_list else None,
         "user_a": user_a,
         "user_b": user_b
     }
+
 
 @app.get("/media/characters_grouped")
 def get_characters_grouped_by_media_type():
